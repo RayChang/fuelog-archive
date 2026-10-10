@@ -1,6 +1,10 @@
-class FuelogCrawlerError(Exception):
-    """Base exception for Fuelog crawler errors."""
+class FuelogCliError(Exception):
+    """Base exception for Fuelog CLI errors."""
 
 
-class NetworkError(FuelogCrawlerError):
+class NetworkError(FuelogCliError):
     """Network-related errors."""
+
+
+class DatabaseConfigError(FuelogCliError):
+    """Database configuration error."""
