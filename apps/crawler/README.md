@@ -10,9 +10,14 @@ apps/crawler/
 │   └── fuelog_crawler/     # Main package
 │       ├── __init__.py     # Package initialization
 │       ├── __main__.py     # Support for python -m execution
-│       ├── cli.py          # CLI main logic
-│       ├── config.py       # Configuration management with Pydantic
-│       └── exceptions.py   # Custom exception classes
+│       ├── cli.py          # CLI entry point (Typer app)
+│       ├── commands/       # One module per CLI command
+│       │   ├── __init__.py         # Registers commands on the app
+│       │   ├── config.py           # `fuelog config` sub-commands
+│       │   └── get_retail_price.py # `fuelog fetch`
+│       ├── config.py       # Persistent configuration with Pydantic
+│       ├── exceptions.py   # Custom exception classes
+│       └── utils.py        # Date parsing and database config checks
 ├── tests/
 │   ├── __init__.py
 │   └── test_basic.py       # Basic tests with improved path handling
@@ -34,17 +39,59 @@ uv sync
 uv sync --no-dev
 ```
 
-### CLI Usage Examples
+### Activate the Virtual Environment (Important)
 
-After installation, you can use the CLI directly:
+A local virtual environment is created at `.venv/` after `uv sync`.
+
+Two ways to run commands:
+
+1. Activate once, then call the script directly (best for continuous work)
+2. Skip activation and prefix each command with `uv run` (best for one‑off calls)
+
+Activate (option 1):
 
 ```bash
-# Run CLI commands
-fuelog-crawler hello
-fuelog-crawler info
+source .venv/bin/activate  # macOS / Linux
+which python               # should point to project/.venv
+```
 
-# Or use python -m
+Deactivate later:
+
+```bash
+deactivate
+```
+
+Skip activating (option 2 – on demand):
+
+```bash
+uv run fuelog info
+uv run python -m fuelog_crawler info
+```
+
+Choose one style; you don't need both at the same time.
+
+### CLI Usage Examples
+
+Activated venv (most convenient during development):
+
+```bash
+fuelog info
+fuelog info
 python -m fuelog_crawler info
+```
+
+Without activation (one‑off invocations):
+
+```bash
+uv run fuelog info
+uv run python -m fuelog_crawler info
+```
+
+Helpful introspection:
+
+```bash
+fuelog --help
+fuelog fetch --help
 ```
 
 ### System Installation
@@ -54,7 +101,7 @@ python -m fuelog_crawler info
 uv tool install .
 
 # Use the installed command
-fuelog-crawler hello
+fuelog info
 ```
 
 ## 🛠️ Development
@@ -128,21 +175,22 @@ uv tool uninstall fuelog-crawler
 
 This tool uses [typer](https://typer.tiangolo.com/) as the CLI framework, making it easy to add new commands:
 
-1. Add a new function in `src/fuelog_crawler/cli.py` and decorate it with `@app.command()`
-2. Reinstall/sync dependencies to use the new command
+1. Add a module in `src/fuelog_crawler/commands/` that defines the command function
+2. Register it in `register_commands` in `src/fuelog_crawler/commands/__init__.py`
 
 Example:
 
 ```python
-import typer
-app = typer.Typer()
+# src/fuelog_crawler/commands/update_database.py
+def update_database(dry_run: bool = False) -> None:
+    """Update the fuel price database."""
+    print(f"Updating database (dry run: {dry_run})")
 
-@app.command()
-def hello(name: str = "world"):
-	print(f"👋 Hello, {name}!")
 
-if __name__ == "__main__":
-	app()
+# src/fuelog_crawler/commands/__init__.py, inside register_commands
+from .update_database import update_database
+
+app.command(name="update")(update_database)
 ```
 
 ## 🔧 Architecture & Development Workflow
