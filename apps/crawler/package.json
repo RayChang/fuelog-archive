@@ -15,6 +15,6 @@
     "python:lint": "uv run ruff check .",
     "python:type-check": "uv run mypy .",
     "python:test": "uv run pytest",
-    "python:run": "uv run python -m fuelog_crawler hello"
+    "python:run": "uv run python -m fuelog_crawler info"
   }
 }

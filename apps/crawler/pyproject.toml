@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
-fuelog-crawler = "fuelog_crawler.cli:main"
+fuelog = "fuelog_crawler.cli:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -37,7 +37,7 @@ line-length = 88
 # Modern Python best practices rule set with web scraping focus
 select = [
     "E",   # pycodestyle errors
-    "W",   # pycodestyle warnings  
+    "W",   # pycodestyle warnings
     "F",   # Pyflakes
     "I",   # isort (import sorting)
     "N",   # pep8-naming

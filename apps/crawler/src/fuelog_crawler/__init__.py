@@ -6,6 +6,7 @@ A CLI tool for data crawling, installable via uv tool install.
 
 try:
     from importlib.metadata import version
+
     __version__ = version("fuelog-crawler")
 except ImportError:
     # Development fallback - read from pyproject.toml
